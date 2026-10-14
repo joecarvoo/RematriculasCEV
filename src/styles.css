@@ -85,3 +85,11 @@ input, textarea { width: 100%; padding: 10px; border: 2px solid #c9d8ff; border-
 .enviar { display: block; width: 100%; margin: 10px 0 0; padding: 12px; border: 0; border-radius: 12px; background: var(--whats); color: #fff; font-weight: 800; }
 .enviar:disabled { opacity: .5; }
 .whats { background: #fff; color: var(--whats); border: 2px solid var(--whats); font-weight: 700; padding: 9px; }
+.busca-geral { position: sticky; top: 56px; z-index: 3; background: var(--fundo); padding-bottom: 8px; }
+.busca-geral input { font-size: 16px; }
+.resultados { background: #fff; border-radius: 12px; margin-top: 6px; max-height: 60vh; overflow-y: auto; box-shadow: 0 6px 18px rgba(51,48,192,.2); }
+.resultados .meta { padding: 10px 12px; margin: 0; }
+.achado { display: block; width: 100%; text-align: left; padding: 10px 12px; border: 0; border-left: 6px solid var(--verde); background: #fff; border-bottom: 1px solid #e6ecff; }
+.achado.risco-amarela { border-left-color: var(--amarela); }
+.achado.risco-vermelha { border-left-color: var(--vermelha); }
+.achado small { display: block; font-size: 13px; opacity: .75; }

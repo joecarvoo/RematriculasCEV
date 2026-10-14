@@ -7,6 +7,7 @@ import Login from './screens/Login'
 import Hoje from './screens/Hoje'
 import Todas from './screens/Todas'
 import Painel from './screens/Painel'
+import Busca from './screens/Busca'
 import FamiliaTela from './screens/FamiliaTela'
 
 type Aba = 'hoje' | 'todas' | 'painel'
@@ -67,6 +68,7 @@ export default function App() {
           Sair
         </button>
       </header>
+      <Busca familias={familias} abrir={setAberta} />
 
       {erro && <p className="aviso">{erro}</p>}
       {!erro && !carregando && familias.length === 0 && (
