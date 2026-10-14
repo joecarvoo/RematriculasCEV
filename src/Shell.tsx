@@ -6,6 +6,7 @@ import Painel from './screens/Painel'
 import Relatorio from './screens/Relatorio'
 import Busca from './screens/Busca'
 import FamiliaTela from './screens/FamiliaTela'
+import Instalar from './Instalar'
 import { Forma, Icone, PilulaLogo } from './ui'
 
 export type Aba = 'hoje' | 'todas' | 'painel' | 'relatorio'
@@ -49,6 +50,8 @@ export default function Shell({
         </div>
         <Busca familias={familias} abrir={setAberta} />
       </div>
+
+      <Instalar />
 
       {erro && <p className="aviso" role="alert">{erro}</p>}
       {!erro && !carregando && familias.length === 0 && (

@@ -26,6 +26,12 @@ Cores de etapa, sempre nesta ordem (a do anel da logo): contatada ciano, respond
 Adaptações para celular (os componentes oficiais têm escala de slide de 1080 px): tamanhos menores, nada abaixo de 14 px, cantos 28 px em vez de 56 px. Fora do sistema, por necessidade: verde e vermelho funcionais para o risco, sempre com a palavra ao lado, e ícones de busca, voltar, sair e mais, que o sistema não tem.
 Para ver as telas com famílias inventadas: `npm run dev` e abrir `/demo.html?tela=hoje|todas|painel|familia|login`. Essa página não entra no site publicado.
 
+## App instalável (PWA)
+O painel se instala na tela inicial do celular e abre em tela cheia, com o ícone da foto de perfil aprovada do CEV (anel + logo). Arquivos: `public/manifest.webmanifest`, `public/icons/`, `public/sw.js` (service worker). O service worker guarda **só a casca** (páginas, imagens, fontes) para abrir sem internet; **nunca** guarda dados do Supabase, famílias, telefones ou mensagens. Os dados continuam exigindo internet e login.
+- **Android (Chrome):** aparece o convite "Instale o painel no celular" no topo; ou menu ⋮ → Instalar app.
+- **iPhone (Safari):** Compartilhar → Adicionar à Tela de Início (o convite do app mostra o passo a passo).
+- Atualização: o app confere a versão nova toda vez que abre com internet.
+
 ## Como funciona
 - Lê direto do Supabase (`rwimyzactkmouqzgabui`): alunos ativos em 2026, responsável financeiro e turno 2027 do WhatsApp. Não copia dados.
 - Tabelas novas: `rematricula_familias` (54 linhas já importadas) e `rematricula_registros`. SQL em `supabase/migrations/`.
