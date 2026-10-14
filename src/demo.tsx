@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client'
 import { Familia, Mensagem, Registro } from './lib'
 import Shell from './Shell'
 import Login from './screens/Login'
+import './tokens.css'
 import './styles.css'
 
 const agora = Date.now()

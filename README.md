@@ -16,9 +16,10 @@ O comunicado leva botões de resposta rápida (micro compromisso sobre o turno 2
 ### Mensagens na tela da família
 A função `enviar-whatsapp` guarda o texto enviado e o código da Evolution em `rematricula_mensagens`. A função `evolution-webhook` (sem login, protegida por um token na URL guardado em `rematricula_config`) recebe os avisos `MESSAGES_UPDATE` (entregue, lida) e `MESSAGES_UPSERT` (respostas) da instância `Cev`. Só grava resposta de quem é família da campanha, pelo final do telefone. A tela da família atualiza sozinha a cada 15 s. Para religar o aviso: `POST /webhook/set/Cev` na Evolution com a URL `.../functions/v1/evolution-webhook?t=<token>` e os eventos MESSAGES_UPSERT e MESSAGES_UPDATE.
 
-## Design (sistema Vencedores)
-Cores, fontes e formas vêm do `design-cev` do repositório de carrosséis: índigo, azul-claro, ciano, azul, amarelo, Sora nos títulos e DM Sans no texto, pílulas, sombra única e a logo sempre intacta na pílula branca. O anel da logo é o dado: as quatro etapas (contatada, respondeu, reserva, paga) usam sempre a ordem e as cores do anel (ciano, azul, índigo, amarelo), no gráfico do Painel e nos botões dos cartões. O verde do WhatsApp só aparece no botão de enviar.
-Exceções (o sistema de slides não prevê app): tamanhos menores para celular (nada abaixo de 14 px) e verde e vermelho funcionais para o risco, sempre com a palavra ao lado.
+## Design (sistema oficial Vencedores)
+Fonte única: o design system **Vencedores** da conta do Joe (artefato "Vencedores" com 27 componentes). Os tokens oficiais estão copiados sem alteração em `src/tokens.css` (cores, fontes Sora e DM Sans, raios, sombra). Peças oficiais usadas: **Anel** (45% ciano, 25% azul, 20% índigo, 10% amarelo, com número sobre disco branco), **Estatística** (anel de progresso com ponto amarelo, no Painel), **Passos** (anel numerado e linha pontilhada azul, nas metas), **PilulaLogo**, forma circular do canto e a logo oficial intacta.
+Cores de etapa, sempre nesta ordem (a do anel da logo): contatada ciano, respondeu azul, reserva índigo, paga amarelo. O verde do WhatsApp só aparece no botão de enviar.
+Adaptações para celular (os componentes oficiais têm escala de slide de 1080 px): tamanhos menores, nada abaixo de 14 px, cantos 28 px em vez de 56 px. Fora do sistema, por necessidade: verde e vermelho funcionais para o risco, sempre com a palavra ao lado, e ícones de busca, voltar, sair e mais, que o sistema não tem.
 Para ver as telas com famílias inventadas: `npm run dev` e abrir `/demo.html?tela=hoje|todas|painel|familia|login`. Essa página não entra no site publicado.
 
 ## Como funciona

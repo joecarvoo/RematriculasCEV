@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react'
 import { supabase } from '../supabase'
-import { Anel, Forma } from '../ui'
+import { Forma } from '../ui'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -21,9 +21,7 @@ export default function Login() {
     <main className="login-tela">
       <Forma className="forma-login" />
       <form className="login" onSubmit={entrar}>
-        <Anel tamanho={88}>
-          <img src="/cev-logo.png" alt="Centro Educacional Vencedores" width={44} height={44} />
-        </Anel>
+        <img className="login-logo" src="/cev-logo.png" alt="Centro Educacional Vencedores" width={72} height={72} />
         <h1>Rematrícula 2027</h1>
         <p>Entre para acompanhar as famílias do CEV.</p>
         <label>

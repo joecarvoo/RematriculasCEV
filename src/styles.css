@@ -2,25 +2,15 @@
    Tokens do kit (design-cev/kit/tokens.css). Tamanhos reduzidos para celular:
    o mínimo de 32 px vale para slides de 1080 px; aqui nada fica abaixo de 14 px. */
 :root {
-  --indigo: #3330c0;
-  --azul: #1e8fe5;
-  --ciano: #00d4ff;
-  --amarelo: #ffd500;
-  --branco: #fff;
-  --azul-claro: #e6f8ff;
-  --ciano-claro: #9fedff;
-  --azul-gelo: #bde2f9;
-  --whatsapp: #17a049;
-  --ponto-inativo: #b4c0ed;
-  --sombra-suave: 0 12px 32px rgba(51, 48, 192, 0.18);
-  --r-pill: 999px;
+  /* Cores, fontes, sombra e raios vêm de tokens.css (design system oficial Vencedores). */
+  /* Específicos do app (celular): raios e fontes em escala menor que a do slide de 1080 px. */
+  --r-pill: var(--radius-pill);
   --r-lg: 28px;
   --r-md: 16px;
+  --font-titulo: var(--font-carrossel);
   /* Funcionais (não são da marca): risco precisa de verde e vermelho, sempre com a palavra ao lado. */
   --risco-verde: #1f9d61;
   --risco-vermelha: #d93a34;
-  --font-titulo: 'Sora', system-ui, sans-serif;
-  --font-texto: 'DM Sans', system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -45,16 +35,15 @@ p { margin: 0; text-wrap: pretty; }
 .meta { font-size: 14px; line-height: 20px; opacity: 0.85; }
 
 /* Forma orgânica e anel */
-.forma { position: absolute; pointer-events: none; }
+.forma { position: absolute; display: block; border-radius: 50%; background: var(--forma); pointer-events: none; }
 .anel { position: relative; display: inline-grid; place-items: center; flex: none; }
 .anel > svg { position: absolute; inset: 0; }
-.anel-centro { position: relative; display: grid; place-items: center; text-align: center; }
-.anel-num { font: 700 26px/1 var(--font-titulo); letter-spacing: -0.02em; }
+.anel-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-titulo); font-weight: 700; line-height: 1; letter-spacing: -0.02em; color: var(--texto-superficie); }
 
 /* Topo fixo: logo na pílula branca + busca */
 .topo { position: sticky; top: 0; z-index: 10; margin: 0 -16px; padding: calc(12px + env(safe-area-inset-top)) 16px 10px; background: var(--azul-claro); overflow: hidden; }
 .topo > *:not(.forma) { position: relative; z-index: 1; }
-.forma-topo { top: 0; right: 0; width: 170px; height: 120px; z-index: 0; }
+.forma-topo { top: -125px; right: -136px; width: 300px; height: 300px; z-index: 0; }
 .topo-linha { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
 .pilula-logo { display: inline-flex; align-items: center; gap: 10px; padding: 6px 18px 6px 6px; border-radius: var(--r-pill); background: var(--branco); box-shadow: var(--sombra-suave); }
 .pilula-logo img { border-radius: 50%; display: block; }
@@ -108,7 +97,7 @@ p { margin: 0; text-wrap: pretty; }
 
 .enviar { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 54px; padding: 12px 20px; border: 0; border-radius: var(--r-pill); background: var(--whatsapp); color: var(--branco); font: 700 16px/22px var(--font-titulo); text-align: center; }
 .enviar svg { flex: none; }
-.abrir-wa { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; border-radius: var(--r-pill); background: var(--azul-claro); font: 700 14px/20px var(--font-titulo); text-decoration: none; }
+.abrir-wa { color: var(--texto-superficie); display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; border-radius: var(--r-pill); background: var(--azul-claro); font: 700 14px/20px var(--font-titulo); text-decoration: none; }
 
 /* As quatro etapas acendem nas cores do anel da logo, sempre nesta ordem */
 .etapas { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -142,29 +131,35 @@ input:focus, textarea:focus { outline: none; border-color: var(--indigo); }
 .riscos button.sel { opacity: 1; border-color: var(--indigo); box-shadow: 0 0 0 2px var(--branco) inset; }
 
 /* Painel */
-.heroi { display: grid; place-items: center; margin: 4px 0 20px; }
-.heroi-num { font: 700 64px/64px var(--font-titulo); letter-spacing: -0.03em; }
-.heroi-leg { width: 120px; font-size: 14px; line-height: 18px; }
-.heroi-pct { margin-top: 8px; padding: 2px 12px; border-radius: var(--r-pill); background: var(--amarelo); font: 700 14px/20px var(--font-titulo); }
-.arco { animation: desenha 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.heroi { display: grid; place-items: center; margin: 4px 0 22px; }
+.est { display: inline-flex; flex-direction: column; align-items: center; }
+.est-anel { position: relative; }
+.est-anel svg { display: block; }
+.est-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-titulo); font-weight: 700; line-height: 1; letter-spacing: -0.04em; }
+.est-leg { max-width: 260px; margin-top: 14px; text-align: center; font: 700 17px/24px var(--font-titulo); letter-spacing: -0.02em; text-wrap: balance; }
+.est-arco { animation: desenha 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 @keyframes desenha { from { stroke-dasharray: 0.01 2000; } }
-.legenda { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
-.legenda li { display: flex; align-items: center; gap: 12px; min-height: 48px; }
-.legenda span { flex: 1; }
+.legenda { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.legenda li { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 6px 12px; }
 .legenda b { font: 700 22px/26px var(--font-titulo); letter-spacing: -0.02em; }
 .legenda small { font: 400 14px/20px var(--font-texto); letter-spacing: 0; }
-.ponto { width: 16px; height: 16px; border-radius: 50%; flex: none; }
-.ponto.ciano { background: var(--ciano); } .ponto.azul { background: var(--azul); } .ponto.indigo { background: var(--indigo); } .ponto.amarelo { background: var(--amarelo); }
+.trilho { grid-column: 1 / -1; display: block; height: 12px; border-radius: var(--r-pill); background: var(--ponto-inativo); overflow: hidden; }
+.enche { display: block; height: 100%; border-radius: var(--r-pill); }
+.enche.ciano { background: var(--ciano); } .enche.azul { background: var(--azul); } .enche.indigo { background: var(--indigo); } .enche.amarelo { background: var(--amarelo); }
+/* Metas = Passos oficial: anel numerado + linha pontilhada azul */
 .marcos { margin: 0; padding: 0; list-style: none; }
-.marcos li { position: relative; display: grid; grid-template-columns: 24px 1fr auto; align-items: start; gap: 14px; padding: 8px 0 14px; }
-.marcos li:not(:last-child)::after { content: ''; position: absolute; left: 10px; top: 34px; bottom: -4px; width: 3px; background: var(--azul-gelo); border-radius: 2px; }
-.bolinha { display: grid; place-items: center; width: 24px; height: 24px; margin-top: 1px; border: 3px solid var(--indigo); border-radius: 50%; background: var(--branco); color: var(--branco); }
-.marcos .ok .bolinha { background: var(--indigo); }
-.marcos .proximo .bolinha { background: var(--amarelo); }
-.marcos .atrasado .bolinha { border-color: var(--risco-vermelha); }
-.marcos b { display: block; font: 700 16px/22px var(--font-titulo); }
-.marcos span { font-size: 15px; line-height: 22px; }
-.marcos em { font: 700 14px/22px var(--font-titulo); font-style: normal; }
+.marcos li { display: flex; gap: 16px; padding-bottom: 20px; }
+.marcos li:last-child { padding-bottom: 0; }
+.passo-no { display: flex; flex-direction: column; align-items: center; align-self: stretch; flex: none; }
+.passo-no::after { content: ''; flex: 1; width: 0; margin-top: 6px; min-height: 12px; border-left: 4px dotted var(--azul); }
+.marcos li:last-child .passo-no::after { display: none; }
+.passo-tx { padding-top: 2px; }
+.passo-tx b { display: block; font: 700 18px/24px var(--font-titulo); letter-spacing: -0.02em; }
+.passo-tx span { display: block; font-size: 15px; line-height: 22px; }
+.passo-tx em { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; padding: 2px 10px; border-radius: var(--r-pill); background: var(--branco); font: 700 14px/20px var(--font-titulo); font-style: normal; }
+.marcos .ok em { background: var(--indigo); color: var(--branco); }
+.marcos .proximo em { background: var(--amarelo); }
+.marcos .atrasado em { box-shadow: inset 0 0 0 2px var(--risco-vermelha); }
 
 /* Família */
 .chips { display: flex; flex-wrap: wrap; gap: 8px 6px; }
@@ -202,9 +197,8 @@ input:focus, textarea:focus { outline: none; border-color: var(--indigo); }
 
 /* Login */
 .login-tela { position: relative; display: grid; place-items: center; min-height: 100vh; padding: 24px; overflow: hidden; }
-.forma-login { top: 0; right: 0; width: 240px; height: 210px; }
+.forma-login { top: -190px; right: -170px; width: 430px; height: 430px; }
 .login { position: relative; display: grid; gap: 14px; width: 100%; max-width: 380px; padding: 28px 24px 24px; border-radius: var(--r-lg); background: var(--branco); box-shadow: var(--sombra-suave); }
-.login .anel { justify-self: start; }
-.login .anel img { display: block; border-radius: 50%; }
+.login-logo { justify-self: start; border-radius: 50%; }
 .login h1 { font-size: 28px; line-height: 32px; }
 .login p:not(.aviso) { margin-top: -6px; text-wrap: balance; }

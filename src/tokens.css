@@ -1,0 +1,104 @@
+/* Vencedores — generated from tokens.json */
+:root, [data-theme="claro"] {
+  --indigo: #3330c0; /* Contraste. Texto sobre fundo claro (8,3:1 no `azul-claro`), caixa de título, fundo da variação B e segmento escuro do anel da logo. */
+  --azul: #1e8fe5; /* Apoio. Formas secundárias, ícones, segmento do anel e palavra de destaque em títulos grandes sobre fundo claro (3,2:1; só a partir de 24px em negrito). Nunca texto pequeno e nunca sobre `indigo` (2,6:1). */
+  --ciano: #00d4ff; /* Cor da marca. Anel da foto, botão de seta, cartão de opção, bolinha ativa. Texto sobre ele em `indigo` (5,1:1). Nunca como texto sobre fundo claro. */
+  --amarelo: #ffd500; /* Destaque. Segmento do anel, ícones, ondinha sublinhada, selo de número e palavras de destaque sobre `indigo` (6,4:1). Sobre fundo claro é só preenchimento, com texto `indigo` por cima. */
+  --branco: #ffffff; /* Pílulas, cartões e texto sobre `indigo` (9,0:1). */
+  --azul-claro: #e6f8ff; /* Fundo dos slides da variação A. Texto sobre ele: `indigo`. */
+  --ciano-claro: #9fedff; /* Forma orgânica grande ao fundo, só decorativa, no canto do slide claro. */
+  --azul-gelo: #bde2f9; /* Segunda forma orgânica ao fundo da capa clara, só decorativa. */
+  --indigo-vivo: #2e43c7; /* Forma orgânica ao fundo dos slides sobre `indigo`, só decorativa. */
+  --whatsapp: #17a049; /* Só o botão de WhatsApp do CTA. Texto branco em corpo grande e negrito (3,4:1); nunca em texto pequeno. */
+  --fundo: var(--azul-claro); /* Fundo do slide nas variações A e B. */
+  --forma: var(--ciano-claro); /* Forma orgânica ao fundo. Fica no canto e nunca atrás de texto pequeno. */
+  --texto: var(--indigo); /* Texto direto sobre `fundo` (8,3:1 e 9,0:1). */
+  --texto-destaque: var(--azul); /* Uma ou duas palavras de destaque em título grande sobre `fundo`. Em A, `azul` (3,2:1: só 24px ou mais, em negrito); em B, `amarelo` (6,4:1). */
+  --superficie: var(--branco); /* Cartões de opção, pílula do @ e da logo, e moldura da logo. Branco nas duas variações. */
+  --texto-superficie: var(--indigo); /* Texto sobre `superficie` (9,0:1). */
+  --caixa: var(--indigo); /* Caixa arredondada do headline da capa. Em A é índigo; em B é branca. */
+  --texto-caixa: var(--branco); /* Texto dentro de `caixa` (9,0:1). Palavra de destaque: `amarelo` em A (6,4:1); em B, `indigo` sobre uma faixa `amarelo`. */
+  --ponto-inativo: #b4c0ed; /* Bolinhas de página que não estão ativas. A ativa usa `indigo` em A e `branco` em B. */
+  --sombra-suave: 0 12px 32px rgba(51, 48, 192, 0.18); /* Cartões de opção, pílulas e caixa de headline sobre `fundo` claro. */
+}
+[data-theme="indigo"] {
+  --fundo: var(--indigo);
+  --forma: var(--indigo-vivo);
+  --texto: var(--branco);
+  --texto-destaque: var(--amarelo);
+  --superficie: var(--branco);
+  --texto-superficie: var(--indigo);
+  --caixa: var(--branco);
+  --texto-caixa: var(--indigo);
+  --ponto-inativo: #6b69d1;
+}
+:root {
+  --space-2: 8px; /* Espaço entre bolinhas de página e entre ícone e texto. */
+  --space-4: 16px; /* Espaço entre elementos relacionados. */
+  --space-6: 24px; /* Padding interno de pílulas e etiquetas. */
+  --space-8: 32px; /* Espaço entre cartões de opção. */
+  --space-12: 48px; /* Espaço entre blocos do slide. */
+  --margem-moldura: 60px; /* Margem de pílula do @, moldura de foto, caixa de headline, bolinhas e botão da capa. */
+  --margem-texto: 80px; /* Margem esquerda dos títulos, textos e cartões de opção. Nada de texto fora dela. */
+  --radius-md: 28px; /* Selo amarelo e etiquetas. */
+  --radius-lg: 56px; /* Moldura de foto e caixa de headline da capa. */
+  --radius-pill: 999px; /* Cartões de opção, pílula do @, botão 'Arraste pra ver', botão de seta e bolinhas. */
+  --font-carrossel: "Sora", system-ui, sans-serif;
+  --font-texto: "DM Sans", system-ui, sans-serif;
+  --text-headline: 700 100px/108px var(--font-carrossel); /* Headline da capa em `caixa`, até 8 palavras. */
+  --text-titulo: 700 84px/92px var(--font-carrossel); /* Título dos slides internos sobre `fundo`, com até duas palavras em `texto-destaque`. */
+  --text-chamada: 700 56px/64px var(--font-carrossel); /* Item de lista dentro de cartão de opção, sobre `superficie`. */
+  --text-corpo: 400 40px/56px var(--font-texto); /* Texto do corpo. Trechos importantes em peso 700. */
+  --text-rotulo: 700 32px/36px var(--font-carrossel); /* Seção ao lado do anel, @ na pílula, etiqueta e 'Arraste pra ver'. */
+  --text-numero: 700 160px/160px var(--font-carrossel); /* Número de destaque em selo `amarelo` ou no anel de contagem. */
+  --text-comemorativo: 800 140px/120px var(--font-carrossel); /* Título de datas comemorativas, com contorno de formas em `azul` e `ciano`. */
+}
+.headline {
+  font-family: var(--font-carrossel);
+  font-size: 100px;
+  line-height: 108px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.titulo {
+  font-family: var(--font-carrossel);
+  font-size: 84px;
+  line-height: 92px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.chamada {
+  font-family: var(--font-carrossel);
+  font-size: 56px;
+  line-height: 64px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.corpo {
+  font-family: var(--font-texto);
+  font-size: 40px;
+  line-height: 56px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.rotulo {
+  font-family: var(--font-carrossel);
+  font-size: 32px;
+  line-height: 36px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.numero {
+  font-family: var(--font-carrossel);
+  font-size: 160px;
+  line-height: 160px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.comemorativo {
+  font-family: var(--font-carrossel);
+  font-size: 140px;
+  line-height: 120px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}

@@ -16,9 +16,7 @@ export default function Hoje({
   return (
     <section>
       <header className="cab">
-        <Anel tamanho={72}>
-          <span className="anel-num">{lista.length}</span>
-        </Anel>
+        <Anel tamanho={72} numero={lista.length} />
         <div>
           <h2>Hoje</h2>
           <p>{lista.length === 1 ? 'família para abordar' : 'famílias para abordar'}</p>

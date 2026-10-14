@@ -35,9 +35,7 @@ export default function Todas({
   return (
     <section>
       <header className="cab">
-        <Anel tamanho={72}>
-          <span className="anel-num">{familias.length}</span>
-        </Anel>
+        <Anel tamanho={72} numero={familias.length} />
         <div>
           <h2>Todas</h2>
           <p>Toque na bolinha para classificar o risco</p>

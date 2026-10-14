@@ -1,5 +1,3 @@
-import { ReactNode } from 'react'
-
 /* Peças do design system Vencedores (kit/componentes.js), portadas para o app. */
 
 const ICONES: Record<string, string[]> = {
@@ -28,69 +26,69 @@ export function Icone({ nome, tamanho = 20, traco = 2.4 }: { nome: string; taman
   )
 }
 
-/** Anel da logo: donut em 4 segmentos (ciano, azul, índigo, amarelo). */
-export function Anel({ tamanho = 64, children }: { tamanho?: number; children?: ReactNode }) {
-  const segs = ['ciano', 'azul', 'indigo', 'amarelo']
-  const w = Math.round(tamanho * 0.2)
-  const r = (tamanho - w) / 2
+/** Anel oficial Vencedores: segmentos ciano 45%, azul 25%, índigo 20% e amarelo 10%.
+ *  Com `numero`, vira contador sobre disco branco. Não reordenar os segmentos. */
+const SEGMENTOS: [string, number][] = [['ciano', 0.45], ['azul', 0.25], ['indigo', 0.2], ['amarelo', 0.1]]
+
+export function Anel({ tamanho = 72, numero }: { tamanho?: number; numero?: number | string }) {
+  const comNumero = numero !== undefined && numero !== ''
+  const r = comNumero ? tamanho * 0.37 : tamanho * 0.4
+  const sw = comNumero ? tamanho * 0.18 : tamanho * 0.2
+  const c = tamanho / 2
   const C = 2 * Math.PI * r
-  const len = C / segs.length
-  const gap = Math.min(w * 0.45, len * 0.12)
+  let off = 0
   return (
     <div className="anel" style={{ width: tamanho, height: tamanho }}>
       <svg width={tamanho} height={tamanho} viewBox={`0 0 ${tamanho} ${tamanho}`} aria-hidden="true">
-        <g transform={`rotate(-90 ${tamanho / 2} ${tamanho / 2})`}>
-          {segs.map((cor, i) => (
-            <circle key={cor} cx={tamanho / 2} cy={tamanho / 2} r={r} fill="none" stroke={`var(--${cor})`} strokeWidth={w} strokeDasharray={`${len - gap} ${C - len + gap}`} strokeDashoffset={-(i * len + gap / 2)} />
-          ))}
-        </g>
-      </svg>
-      {children != null && <div className="anel-centro">{children}</div>}
-    </div>
-  )
-}
-
-export type ArcoDado = { cor: 'ciano' | 'azul' | 'indigo' | 'amarelo'; valor: number; total: number; nome: string }
-
-/** O anel como gráfico: cada quarto é uma etapa e enche conforme as famílias avançam. */
-export function AnelProgresso({ tamanho = 232, arcos, children }: { tamanho?: number; arcos: ArcoDado[]; children?: ReactNode }) {
-  const w = Math.round(tamanho * 0.14)
-  const r = (tamanho - w) / 2
-  const C = 2 * Math.PI * r
-  const quarto = C / 4
-  const gap = w * 0.5
-  const resumo = arcos.map((a) => `${a.nome}: ${a.valor} de ${a.total}`).join('; ')
-  return (
-    <div className="anel" style={{ width: tamanho, height: tamanho }} role="img" aria-label={resumo}>
-      <svg width={tamanho} height={tamanho} viewBox={`0 0 ${tamanho} ${tamanho}`} aria-hidden="true">
-        <g transform={`rotate(-90 ${tamanho / 2} ${tamanho / 2})`}>
-          {arcos.map((a, i) => {
-            const base = i * quarto + gap / 2
-            const cheio = quarto - gap
-            const f = a.total ? Math.min(1, a.valor / a.total) : 0
-            return (
-              <g key={a.nome}>
-                <circle cx={tamanho / 2} cy={tamanho / 2} r={r} fill="none" stroke="var(--azul-gelo)" strokeWidth={w} strokeLinecap="round" strokeDasharray={`${cheio} ${C - cheio}`} strokeDashoffset={-base} />
-                {f > 0 && (
-                  <circle className="arco" cx={tamanho / 2} cy={tamanho / 2} r={r} fill="none" stroke={`var(--${a.cor})`} strokeWidth={w} strokeLinecap="round" strokeDasharray={`${Math.max(cheio * f, 0.01)} ${C}`} strokeDashoffset={-base} style={{ ['--cheio' as string]: cheio * f }} />
-                )}
-              </g>
-            )
+        {comNumero && <circle cx={c} cy={c} r={c} fill="var(--superficie)" />}
+        <g transform={`translate(${c} ${c}) rotate(-90)`} strokeWidth={sw}>
+          {SEGMENTOS.map(([cor, f]) => {
+            const len = C * f
+            const el = <circle key={cor} r={r} fill="none" stroke={`var(--${cor})`} strokeDasharray={`${len.toFixed(1)} ${C.toFixed(1)}`} strokeDashoffset={(-off).toFixed(1)} />
+            off += len
+            return el
           })}
         </g>
       </svg>
-      {children != null && <div className="anel-centro">{children}</div>}
+      {comNumero && (
+        <span className="anel-num" style={{ fontSize: tamanho * 0.42 }}>
+          {numero}
+        </span>
+      )}
     </div>
   )
 }
 
-/** Forma orgânica do canto: só decorativa, nunca atrás de texto pequeno. */
-export function Forma({ className = '' }: { className?: string }) {
+/** Estatística oficial: anel de progresso que enche até `valor`%, ponto amarelo na ponta. */
+export function Estatistica({ numero, valor, legenda, tamanho = 220 }: { numero: string; valor: number; legenda?: string; tamanho?: number }) {
+  const sw = tamanho * 0.09
+  const r = (tamanho - sw) / 2
+  const c = tamanho / 2
+  const C = 2 * Math.PI * r
+  const v = Math.max(0, Math.min(100, valor)) / 100
+  const ang = v * 2 * Math.PI - Math.PI / 2
   return (
-    <svg className={`forma ${className}`} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M14 0C4 14 12 30 30 37C48 44 44 62 58 75C72 88 90 86 100 70V0Z" fill="var(--ciano-claro)" />
-    </svg>
+    <div className="est">
+      <div className="est-anel" style={{ width: tamanho, height: tamanho }} role="img" aria-label={legenda ? `${numero} ${legenda}` : numero}>
+        <svg width={tamanho} height={tamanho} viewBox={`0 0 ${tamanho} ${tamanho}`} aria-hidden="true">
+          <circle cx={c} cy={c} r={r} fill="none" strokeWidth={sw} stroke="var(--ponto-inativo)" />
+          {v > 0 && (
+            <>
+              <circle className="est-arco" cx={c} cy={c} r={r} fill="none" strokeWidth={sw} strokeLinecap="round" stroke="var(--azul)" strokeDasharray={`${(C * v).toFixed(1)} ${C.toFixed(1)}`} transform={`rotate(-90 ${c} ${c})`} />
+              <circle className="est-ponto" cx={c + r * Math.cos(ang)} cy={c + r * Math.sin(ang)} r={sw * 0.8} fill="var(--amarelo)" stroke="var(--fundo)" strokeWidth={Math.max(2, tamanho * 0.012)} />
+            </>
+          )}
+        </svg>
+        <div className="est-num" style={{ fontSize: tamanho * 0.29 }}>{numero}</div>
+      </div>
+      {legenda && <p className="est-leg">{legenda}</p>}
+    </div>
   )
+}
+
+/** Forma do canto: círculo grande ciano-claro (token `forma`), só decorativo, longe de texto pequeno. */
+export function Forma({ className = '' }: { className?: string }) {
+  return <span className={`forma ${className}`} aria-hidden="true" />
 }
 
 export function PilulaLogo({ texto }: { texto: string }) {
