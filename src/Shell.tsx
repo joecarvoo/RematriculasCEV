@@ -39,7 +39,7 @@ export default function Shell({
   if (familia) return <FamiliaTela familia={familia} voltar={() => setAberta(null)} atualizar={recarregar} demo={demo} />
 
   return (
-    <div className="app">
+    <div className="app com-menu">
       <div className="topo">
         <Forma className="forma-topo" />
         <div className="topo-linha">

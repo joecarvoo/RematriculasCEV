@@ -26,6 +26,11 @@ Cores de etapa, sempre nesta ordem (a do anel da logo): contatada ciano, respond
 Adaptações para celular (os componentes oficiais têm escala de slide de 1080 px): tamanhos menores, nada abaixo de 14 px, cantos 28 px em vez de 56 px. Fora do sistema, por necessidade: verde e vermelho funcionais para o risco, sempre com a palavra ao lado, e ícones de busca, voltar, sair e mais, que o sistema não tem.
 Para ver as telas com famílias inventadas: `npm run dev` e abrir `/demo.html?tela=hoje|todas|painel|familia|login`. Essa página não entra no site publicado.
 
+## Celular e computador (responsivo)
+- **Celular (abaixo de 900 px):** layout aprovado pelo Joel, não mexer. Conferido por comparação de imagens pixel a pixel antes e depois de cada mudança de computador.
+- **Computador (900 px ou mais):** topo largo com busca ao centro, menu lateral (Hoje, Todas, Painel, Relatório), cartões em grade (1 coluna até ~1100 px, 2 em notebook, 3 em tela grande), Painel e Relatório em painéis brancos de duas colunas e tela da família com o cartão à esquerda e conversa e histórico à direita. Passar o mouse mostra reação nos botões.
+- Todo o CSS de computador fica no fim de `src/styles.css`, dentro de `@media (min-width: 900px)`. Os blocos de tela que só existem para o computador (`.cartoes`, `.p-topo`, `.rel-a`, `.fam-a` etc.) são `display: contents` no celular e não mudam nada lá.
+
 ## App instalável (PWA)
 O painel se instala na tela inicial do celular e abre em tela cheia, com o ícone da foto de perfil aprovada do CEV (anel + logo). Arquivos: `public/manifest.webmanifest`, `public/icons/`, `public/sw.js` (service worker). O service worker guarda **só a casca** (páginas, imagens, fontes) para abrir sem internet; **nunca** guarda dados do Supabase, famílias, telefones ou mensagens. Os dados continuam exigindo internet e login.
 - **Android (Chrome):** aparece o convite "Instale o painel no celular" no topo; ou menu ⋮ → Instalar app.

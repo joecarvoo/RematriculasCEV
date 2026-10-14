@@ -16,6 +16,9 @@ Mini-app do Joel (marketing/gestão do Centro Educacional Vencedores, Manaus) pa
 ## Design
 Sistema OFICIAL Vencedores (artefato "Vencedores", o que tem 27 componentes; existe outro com o mesmo nome, vazio: não usar). Tokens oficiais copiados sem alteração em `src/tokens.css`. Peças em `src/ui.tsx`: Anel (45/25/20/10, número sobre disco branco), Estatística, Forma (círculo), PilulaLogo, Icone. Não redesenhar nem reordenar os segmentos do anel. Etapas sempre ciano, azul, índigo, amarelo. Verde do WhatsApp só no botão de enviar. Nunca recolorir a logo. `/demo.html` mostra as telas com dados inventados, só em desenvolvimento.
 
+## Responsividade
+Celular (< 900 px) está APROVADO pelo Joel e não pode mudar: qualquer ajuste de computador vai só dentro de `@media (min-width: 900px)` no fim de `src/styles.css`. Antes de mexer, tirar prints do celular (`/demo.html`, 390 px, relógio fixo) e comparar pixel a pixel depois.
+
 ## Envio pela Evolution
 Função `enviar-whatsapp` (Supabase Edge Function, verify_jwt ligado, roda com a identidade de quem clicou). Texto do comunicado geral dentro dela. Segredos só no Supabase. Decisão do Joe (14/10/2026): a rematrícula sai pela instância `Cev` da Evolution, o número da secretaria, (92) 99433-9299, porque fica mais cômodo para os pais responderem ali. Matrículas novas continuam no (92) 99184-3095 (instância `mat`). Nunca testar envio real com telefone de família: usar `simular: true`.
 

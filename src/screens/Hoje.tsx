@@ -28,9 +28,11 @@ export default function Hoje({
           Quem foi contatada e não tem retorno marcado fica de fora. Procure em Todas.
         </p>
       )}
-      {lista.map((f) => (
-        <Cartao key={f.id} f={f} abrir={abrir} atualizar={atualizar} />
-      ))}
+      <div className="cartoes">
+        {lista.map((f) => (
+          <Cartao key={f.id} f={f} abrir={abrir} atualizar={atualizar} />
+        ))}
+      </div>
     </section>
   )
 }

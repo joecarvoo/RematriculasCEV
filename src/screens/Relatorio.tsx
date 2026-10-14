@@ -66,7 +66,7 @@ export default function Relatorio({ familias, registros, abrir }: { familias: Fa
   }
 
   return (
-    <section>
+    <section className="relatorio">
       <header className="cab">
         <Anel tamanho={72} numero={totais.contatadas} />
         <div>
@@ -83,6 +83,7 @@ export default function Relatorio({ familias, registros, abrir }: { familias: Fa
         </button>
       </div>
 
+      <div className="rel-a">
       <h3>Por dia</h3>
       <table className="tabela">
         <thead>
@@ -137,7 +138,9 @@ export default function Relatorio({ familias, registros, abrir }: { familias: Fa
         ))}
       </ul>
       <p className="meta">Família com filhos em turmas diferentes aparece em cada uma.</p>
+      </div>
 
+      <div className="rel-b">
       <h3>Motivos de hesitação</h3>
       {motivos.length === 0 ? (
         <p className="vazio">
@@ -187,6 +190,7 @@ export default function Relatorio({ familias, registros, abrir }: { familias: Fa
           ))}
         </ul>
       )}
+      </div>
     </section>
   )
 }

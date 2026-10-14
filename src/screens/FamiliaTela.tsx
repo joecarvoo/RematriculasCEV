@@ -65,7 +65,8 @@ export default function FamiliaTela({
           <Icone nome="voltar" tamanho={18} /> Voltar
         </button>
       </header>
-      <main>
+      <main className="familia">
+        <div className="fam-a">
         <Cartao f={familia} abrir={() => {}} atualizar={atualizar} />
 
         <h3>Risco</h3>
@@ -94,6 +95,9 @@ export default function FamiliaTela({
           <small>Situação: <b>{ETAPA_NOME[etapa(familia)]}</b></small>
         </p>
 
+        </div>
+
+        <div className="fam-b">
         <h3>Mensagens</h3>
         {mensagens?.length === 0 && <p className="vazio"><b>Nada trocado ainda.</b>As mensagens enviadas pelo painel e as respostas aparecem aqui.</p>}
         <ul className="conversa">
@@ -138,6 +142,7 @@ export default function FamiliaTela({
             </li>
           ))}
         </ol>
+        </div>
       </main>
     </div>
   )

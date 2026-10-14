@@ -23,7 +23,7 @@ export default function Painel({ familias, registros, abrir }: { familias: Famil
   const pct = total ? Math.round((n.reserva / total) * 100) : 0
 
   return (
-    <section>
+    <section className="painel">
       <header className="cab">
         <div>
           <h2>Painel</h2>
@@ -31,6 +31,7 @@ export default function Painel({ familias, registros, abrir }: { familias: Famil
         </div>
       </header>
 
+      <div className="p-topo">
       <div className="heroi">
         <Estatistica numero={`${pct}%`} valor={pct} legenda={`${n.reserva} de ${total} famílias com a vaga reservada`} />
       </div>
@@ -49,9 +50,14 @@ export default function Painel({ familias, registros, abrir }: { familias: Famil
         ))}
       </ul>
 
+      </div>
+
+      <div className="p-grafico">
       <h3>Resultado por dia</h3>
       <GraficoDias familias={familias} />
+      </div>
 
+      <div className="p-paradas">
       <h3>
         Paradas há mais de 3 dias <span className="contagem">{paradasAgora.length}</span>
       </h3>
@@ -75,6 +81,9 @@ export default function Painel({ familias, registros, abrir }: { familias: Famil
         </ul>
       )}
 
+      </div>
+
+      <div className="p-metas">
       <h3>Metas da campanha</h3>
       <ol className="marcos">
         {MARCOS.map((m, i) => {
@@ -99,6 +108,7 @@ export default function Painel({ familias, registros, abrir }: { familias: Famil
           )
         })}
       </ol>
+      </div>
     </section>
   )
 }
