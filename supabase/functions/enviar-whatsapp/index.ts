@@ -130,7 +130,18 @@ Deno.serve(async (req) => {
   }
   if (!resposta.ok) return json({ erro: 'evolution_recusou', status: resposta.status }, 502)
 
-  // Mensagem saiu: registra e marca como contatada (sem nome nem telefone em log).
+  // Mensagem saiu: guarda o texto e o código da Evolution (o webhook atualiza entregue/lida).
+  const retorno = await resposta.json().catch(() => null)
+  await db.from('rematricula_mensagens').insert({
+    familia_id: fam.id,
+    direcao: 'enviada',
+    tipo: 'comunicado_geral',
+    texto,
+    evolution_id: retorno?.key?.id ?? null,
+    status: 'enviada',
+  })
+
+  // Registra no histórico e marca como contatada (sem nome nem telefone em log).
   const { error: e1 } = await db.from('rematricula_registros').insert({
     familia_id: fam.id,
     canal: 'whatsapp',

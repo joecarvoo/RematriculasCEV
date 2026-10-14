@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import { Familia, Registro, soDigitos } from './lib'
+import { Familia, Mensagem, Registro, soDigitos } from './lib'
 
 type LinhaAluno = {
   responsavel_id: string
@@ -13,7 +13,7 @@ type LinhaAluno = {
 }
 
 export async function carregarFamilias(): Promise<Familia[]> {
-  const [fam, alu, pref, com] = await Promise.all([
+  const [fam, alu, pref, com, resp] = await Promise.all([
     supabase
       .from('rematricula_familias')
       .select('*, responsavel:pessoas!responsavel_id(nome_completo, telefone_principal, email)'),
@@ -25,6 +25,7 @@ export async function carregarFamilias(): Promise<Familia[]> {
       .eq('responsavel_financeiro', true),
     supabase.from('preferencias_turno_2027').select('telefone, turno_preferido'),
     supabase.from('rematricula_registros').select('familia_id, criado_em').eq('resultado', 'Comunicado geral enviado'),
+    supabase.from('rematricula_mensagens').select('familia_id').eq('direcao', 'recebida'),
   ])
   if (fam.error) throw new Error('familias')
   if (alu.error) throw new Error('alunos')
@@ -47,6 +48,9 @@ export async function carregarFamilias(): Promise<Familia[]> {
   const comunicados = new Map<string, string>()
   for (const c of com.data ?? []) comunicados.set(c.familia_id, c.criado_em)
 
+  const respostas = new Map<string, number>()
+  for (const r of resp.data ?? []) respostas.set(r.familia_id, (respostas.get(r.familia_id) ?? 0) + 1)
+
   return (fam.data ?? []).map((f) => {
     const r = f.responsavel as Familia['responsavel']
     return {
@@ -55,6 +59,7 @@ export async function carregarFamilias(): Promise<Familia[]> {
       alunos: alunosPorResp.get(f.responsavel_id) ?? [],
       turno2027: turnoPorFinal.get(soDigitos(r?.telefone_principal).slice(-8)) ?? null,
       comunicadoEm: comunicados.get(f.id) ?? null,
+      respostas: respostas.get(f.id) ?? 0,
     } as Familia
   })
 }
@@ -67,4 +72,14 @@ export async function carregarRegistros(familiaId: string): Promise<Registro[]> 
     .order('criado_em', { ascending: false })
   if (error) throw new Error('registros')
   return data as Registro[]
+}
+
+export async function carregarMensagens(familiaId: string): Promise<Mensagem[]> {
+  const { data, error } = await supabase
+    .from('rematricula_mensagens')
+    .select('id, familia_id, direcao, tipo, texto, status, criado_em')
+    .eq('familia_id', familiaId)
+    .order('criado_em', { ascending: false })
+  if (error) throw new Error('mensagens')
+  return data as Mensagem[]
 }

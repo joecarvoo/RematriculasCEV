@@ -34,6 +34,7 @@ export type Familia = {
   alunos: { nome: string; turma: string; periodo: string }[]
   turno2027: string | null
   comunicadoEm: string | null
+  respostas: number
 }
 
 export type Registro = {
@@ -44,6 +45,24 @@ export type Registro = {
   resultado: string
   nota: string | null
   proximo_contato: string | null
+}
+
+export type Mensagem = {
+  id: string
+  familia_id: string
+  direcao: 'enviada' | 'recebida'
+  tipo: string | null
+  texto: string
+  status: 'enviada' | 'entregue' | 'lida' | 'falhou' | 'recebida'
+  criado_em: string
+}
+
+export const STATUS_MENSAGEM: Record<Mensagem['status'], string> = {
+  enviada: '✓ Enviada',
+  entregue: '✓✓ Entregue',
+  lida: '✓✓ Lida',
+  falhou: '✕ Falhou',
+  recebida: 'Recebida',
 }
 
 export type Etapa = 'sem_contato' | 'contatada' | 'respondeu' | 'reserva' | 'paga'

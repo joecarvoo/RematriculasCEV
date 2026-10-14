@@ -115,6 +115,11 @@ export default function Cartao({
           ))}
         </p>
       )}
+      {f.respostas > 0 && (
+        <p className="resposta">
+          💬 {f.respostas === 1 ? 'Respondeu' : `${f.respostas} respostas`} no WhatsApp{!f.respondeu_em && ' · marque "Respondeu" se for resposta de verdade'}
+        </p>
+      )}
       {f.observacao && <p className="obs">“{f.observacao}”</p>}
 
       <button className="enviar" disabled={ocupado} onClick={enviar}>

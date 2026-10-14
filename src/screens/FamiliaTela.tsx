@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { carregarRegistros } from '../data'
+import { carregarMensagens, carregarRegistros } from '../data'
 import { salvarEtiquetas, salvarRisco } from '../acoes'
-import { ETAPA_NOME, ETIQUETAS, ETIQUETA_NOME, Familia, Registro, Risco, dataCurta, etapa, linkWhatsApp } from '../lib'
+import { ETAPA_NOME, ETIQUETAS, ETIQUETA_NOME, Familia, Mensagem, Registro, Risco, STATUS_MENSAGEM, dataCurta, etapa, linkWhatsApp } from '../lib'
 import Cartao from './Cartao'
 
 export default function FamiliaTela({
@@ -14,6 +14,7 @@ export default function FamiliaTela({
   atualizar: () => Promise<void>
 }) {
   const [registros, setRegistros] = useState<Registro[] | null>(null)
+  const [mensagens, setMensagens] = useState<Mensagem[] | null>(null)
   const [erro, setErro] = useState('')
 
   useEffect(() => {
@@ -21,6 +22,21 @@ export default function FamiliaTela({
       .then(setRegistros)
       .catch(() => setErro('Não consegui carregar o histórico.'))
   }, [familia])
+
+  // Entregue, lida e respostas chegam sozinhas pelo aviso da Evolution: recarrega a cada 15 s.
+  useEffect(() => {
+    let vivo = true
+    const buscar = () =>
+      carregarMensagens(familia.id)
+        .then((m) => vivo && setMensagens(m))
+        .catch(() => undefined)
+    buscar()
+    const t = setInterval(buscar, 15000)
+    return () => {
+      vivo = false
+      clearInterval(t)
+    }
+  }, [familia.id, familia.comunicadoEm])
 
   async function salvar(fn: () => Promise<void>) {
     setErro('')
@@ -71,6 +87,23 @@ export default function FamiliaTela({
           {linkWhatsApp(familia.responsavel?.telefone_principal) && ''}
         </p>
         <p className="meta">Situação: <b>{ETAPA_NOME[etapa(familia)]}</b></p>
+
+        <h3>Mensagens</h3>
+        {mensagens?.length === 0 && <p className="vazio">Nenhuma mensagem enviada ou recebida pelo painel ainda.</p>}
+        <ul className="mensagens">
+          {mensagens?.map((m) => (
+            <li key={m.id} className={m.direcao}>
+              <small>
+                {m.direcao === 'enviada' ? 'Enviada por nós' : 'Resposta da família'} · {dataCurta(m.criado_em)}
+                {m.direcao === 'enviada' && <b className={`st-${m.status}`}> · {STATUS_MENSAGEM[m.status]}</b>}
+              </small>
+              <details>
+                <summary>{m.texto.split('\n').find((l) => l.trim()) ?? ''}</summary>
+                <p>{m.texto}</p>
+              </details>
+            </li>
+          ))}
+        </ul>
 
         <h3>Histórico</h3>
         {erro && <p className="aviso">{erro}</p>}
