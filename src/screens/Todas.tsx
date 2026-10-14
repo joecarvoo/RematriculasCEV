@@ -1,8 +1,13 @@
-import { useState } from 'react'
 import { salvarRisco } from '../acoes'
+import { useState } from 'react'
 import { ETAPA_NOME, Familia, Risco, etapa, ordenar } from '../lib'
+import { Anel, Icone } from '../ui'
 
-const RISCOS: Risco[] = ['verde', 'amarela', 'vermelha']
+const RISCOS: { r: Risco; nome: string }[] = [
+  { r: 'verde', nome: 'verde' },
+  { r: 'amarela', nome: 'amarelo' },
+  { r: 'vermelha', nome: 'vermelho' },
+]
 
 export default function Todas({
   familias,
@@ -13,17 +18,8 @@ export default function Todas({
   abrir: (id: string) => void
   atualizar: () => Promise<void>
 }) {
-  const [busca, setBusca] = useState('')
   const [erro, setErro] = useState('')
-  const q = busca.trim().toLowerCase()
-  const lista = familias
-    .filter(
-      (f) =>
-        !q ||
-        (f.responsavel?.nome_completo ?? '').toLowerCase().includes(q) ||
-        f.alunos.some((a) => a.nome.toLowerCase().includes(q)),
-    )
-    .sort(ordenar)
+  const lista = [...familias].sort(ordenar)
 
   async function mudar(f: Familia, r: Risco) {
     if (f.risco === r) return
@@ -38,26 +34,35 @@ export default function Todas({
 
   return (
     <section>
-      <h2>
-        Todas <small>{familias.length} famílias · classifique o risco aqui</small>
-      </h2>
-      <input className="busca" type="search" placeholder="Buscar responsável ou aluno" value={busca} onChange={(e) => setBusca(e.target.value)} />
-      {erro && <p className="aviso">{erro}</p>}
-      {lista.map((f) => (
-        <div key={f.id} className={`linha-todas risco-${f.risco}`}>
-          <button className="nome" onClick={() => abrir(f.id)}>
-            {f.responsavel?.nome_completo}
-            <small>
-              {f.alunos.map((a) => a.turma).join(' · ')} · {ETAPA_NOME[etapa(f)]}
-            </small>
-          </button>
-          <div className="riscos">
-            {RISCOS.map((r) => (
-              <button key={r} className={`r-${r} ${f.risco === r ? 'sel' : ''}`} aria-label={`Risco ${r}`} onClick={() => mudar(f, r)} />
-            ))}
-          </div>
+      <header className="cab">
+        <Anel tamanho={72}>
+          <span className="anel-num">{familias.length}</span>
+        </Anel>
+        <div>
+          <h2>Todas</h2>
+          <p>Toque na bolinha para classificar o risco</p>
         </div>
-      ))}
+      </header>
+      {erro && <p className="aviso" role="alert">{erro}</p>}
+      <ul className="lista">
+        {lista.map((f) => (
+          <li key={f.id} className="linha-todas">
+            <button className="nome" onClick={() => abrir(f.id)}>
+              {f.responsavel?.nome_completo}
+              <small>
+                {f.alunos.map((a) => a.turma).join(' · ')} · {ETAPA_NOME[etapa(f)]}
+              </small>
+            </button>
+            <div className="riscos" role="group" aria-label={`Risco de ${f.responsavel?.nome_completo}`}>
+              {RISCOS.map(({ r, nome }) => (
+                <button key={r} className={`r-${r} ${f.risco === r ? 'sel' : ''}`} aria-label={`Risco ${nome}`} aria-pressed={f.risco === r} onClick={() => mudar(f, r)}>
+                  {f.risco === r && <Icone nome="check" tamanho={16} traco={3.2} />}
+                </button>
+              ))}
+            </div>
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }

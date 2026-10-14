@@ -1,21 +1,5 @@
 import { Familia, MARCOS, hoje } from '../lib'
-
-function Barra({ valor, total, rotulo }: { valor: number; total: number; rotulo: string }) {
-  const pct = total ? Math.round((valor / total) * 100) : 0
-  return (
-    <div className="barra">
-      <div className="barra-topo">
-        <span>{rotulo}</span>
-        <b>
-          {valor}/{total} · {pct}%
-        </b>
-      </div>
-      <div className="trilho">
-        <div className="enche" style={{ width: `${pct}%` }} />
-      </div>
-    </div>
-  )
-}
+import { AnelProgresso, ArcoDado, Icone } from '../ui'
 
 export default function Painel({ familias }: { familias: Familia[] }) {
   const total = familias.length
@@ -25,38 +9,64 @@ export default function Painel({ familias }: { familias: Familia[] }) {
     reserva: familias.filter((f) => f.reserva_confirmada_em).length,
     paga: familias.filter((f) => f.pago_em).length,
   }
+  const arcos: ArcoDado[] = [
+    { cor: 'ciano', valor: n.contatadas, total, nome: 'Contatadas' },
+    { cor: 'azul', valor: n.respondeu, total, nome: 'Responderam' },
+    { cor: 'indigo', valor: n.reserva, total, nome: 'Reservaram a vaga' },
+    { cor: 'amarelo', valor: n.paga, total, nome: 'Pagaram' },
+  ]
   const dia = hoje()
   const proximo = MARCOS.find((m) => m.data >= dia)
+  const pct = total ? Math.round((n.reserva / total) * 100) : 0
 
   return (
     <section>
-      <h2>Painel <small>meta: {total} famílias</small></h2>
+      <header className="cab">
+        <div>
+          <h2>Painel</h2>
+          <p>Meta: as {total} famílias com a vaga reservada até 31/10 e pagas até 30/11</p>
+        </div>
+      </header>
 
-      <div className="grade">
-        <div className="numero"><b>{n.contatadas}</b>contatadas</div>
-        <div className="numero"><b>{n.respondeu}</b>responderam</div>
-        <div className="numero"><b>{n.reserva}</b>reservas</div>
-        <div className="numero"><b>{n.paga}</b>pagas</div>
+      <div className="heroi">
+        <AnelProgresso tamanho={232} arcos={arcos}>
+          <b className="heroi-num">{n.reserva}</b>
+          <span className="heroi-leg">de {total} vagas reservadas</span>
+          <span className="heroi-pct">{pct}%</span>
+        </AnelProgresso>
       </div>
 
-      <Barra valor={n.reserva} total={total} rotulo="Vaga reservada (até 31/10)" />
-      <Barra valor={n.paga} total={total} rotulo="Rematrícula paga (até 30/11)" />
+      <ul className="legenda">
+        {arcos.map((a) => (
+          <li key={a.nome}>
+            <i className={`ponto ${a.cor}`} aria-hidden="true" />
+            <span>{a.nome}</span>
+            <b>
+              {a.valor} <small>de {a.total}</small>
+            </b>
+          </li>
+        ))}
+      </ul>
 
-      <h3>Metas</h3>
-      <ul className="marcos">
+      <h3>Metas da campanha</h3>
+      <ol className="marcos">
         {MARCOS.map((m) => {
           const atual = m.campo === 'respondeu' ? n.respondeu : m.campo === 'reserva' ? n.reserva : n.paga
           const bateu = atual >= m.meta
           const passou = m.data < dia
+          const estado = bateu ? 'ok' : passou ? 'atrasado' : m === proximo ? 'proximo' : ''
           return (
-            <li key={m.data} className={bateu ? 'ok' : passou ? 'atrasado' : m === proximo ? 'proximo' : ''}>
-              <span>{m.rotulo}</span>
-              <span>{m.texto}</span>
-              <b>{bateu ? '✓' : `${atual}/${m.meta}`}</b>
+            <li key={m.data} className={estado}>
+              <span className="bolinha" aria-hidden="true">{bateu && <Icone nome="check" tamanho={14} traco={3.4} />}</span>
+              <div>
+                <b>{m.rotulo}</b>
+                <span>{m.texto}</span>
+              </div>
+              <em>{bateu ? 'feita' : passou ? `atrasada · ${atual}/${m.meta}` : `${atual}/${m.meta}`}</em>
             </li>
           )
         })}
-      </ul>
+      </ol>
       <p className="meta">Gráfico por dia, famílias paradas e relatório da semana entram na versão 2.</p>
     </section>
   )

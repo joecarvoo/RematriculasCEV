@@ -16,6 +16,11 @@ O comunicado leva botões de resposta rápida (micro compromisso sobre o turno 2
 ### Mensagens na tela da família
 A função `enviar-whatsapp` guarda o texto enviado e o código da Evolution em `rematricula_mensagens`. A função `evolution-webhook` (sem login, protegida por um token na URL guardado em `rematricula_config`) recebe os avisos `MESSAGES_UPDATE` (entregue, lida) e `MESSAGES_UPSERT` (respostas) da instância `Cev`. Só grava resposta de quem é família da campanha, pelo final do telefone. A tela da família atualiza sozinha a cada 15 s. Para religar o aviso: `POST /webhook/set/Cev` na Evolution com a URL `.../functions/v1/evolution-webhook?t=<token>` e os eventos MESSAGES_UPSERT e MESSAGES_UPDATE.
 
+## Design (sistema Vencedores)
+Cores, fontes e formas vêm do `design-cev` do repositório de carrosséis: índigo, azul-claro, ciano, azul, amarelo, Sora nos títulos e DM Sans no texto, pílulas, sombra única e a logo sempre intacta na pílula branca. O anel da logo é o dado: as quatro etapas (contatada, respondeu, reserva, paga) usam sempre a ordem e as cores do anel (ciano, azul, índigo, amarelo), no gráfico do Painel e nos botões dos cartões. O verde do WhatsApp só aparece no botão de enviar.
+Exceções (o sistema de slides não prevê app): tamanhos menores para celular (nada abaixo de 14 px) e verde e vermelho funcionais para o risco, sempre com a palavra ao lado.
+Para ver as telas com famílias inventadas: `npm run dev` e abrir `/demo.html?tela=hoje|todas|painel|familia|login`. Essa página não entra no site publicado.
+
 ## Como funciona
 - Lê direto do Supabase (`rwimyzactkmouqzgabui`): alunos ativos em 2026, responsável financeiro e turno 2027 do WhatsApp. Não copia dados.
 - Tabelas novas: `rematricula_familias` (54 linhas já importadas) e `rematricula_registros`. SQL em `supabase/migrations/`.

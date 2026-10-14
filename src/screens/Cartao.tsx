@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { anotar, desfazer, enviarComunicado, marcar, Marco, NOME_MARCO } from '../acoes'
 import { Canal, ETAPA_NOME, ETIQUETA_NOME, Familia, dataCurta, etapa, linkWhatsApp } from '../lib'
+import { Icone } from '../ui'
 
 const BOTOES: { marco: Marco; campo: keyof Familia; rotulo: string }[] = [
   { marco: 'contatado_em', campo: 'contatado_em', rotulo: 'Contatado' },
@@ -8,6 +9,16 @@ const BOTOES: { marco: Marco; campo: keyof Familia; rotulo: string }[] = [
   { marco: 'reserva_confirmada_em', campo: 'reserva_confirmada_em', rotulo: 'Reserva' },
   { marco: 'pago_em', campo: 'pago_em', rotulo: 'Pagou' },
 ]
+
+const NOME_RISCO = { verde: 'Risco verde', amarela: 'Risco amarelo', vermelha: 'Risco vermelho' }
+
+const MENSAGEM_ERRO: Record<string, string> = {
+  telefone_invalido: 'O telefone dessa família não parece válido.',
+  evolution_nao_configurada: 'A Evolution ainda não foi configurada no Supabase.',
+  evolution_fora_do_ar: 'A Evolution não respondeu. Veja se a VPS está no ar.',
+  evolution_recusou: 'A Evolution recusou o envio. Veja se o WhatsApp está conectado.',
+  sem_permissao: 'Esta conta não tem permissão para enviar.',
+}
 
 function lerCanal(): Canal {
   try {
@@ -55,14 +66,6 @@ export default function Cartao({
     return rodar(() => marcar(f, marco, canal))
   }
 
-  const MENSAGEM_ERRO: Record<string, string> = {
-    telefone_invalido: 'O telefone dessa família não parece válido.',
-    evolution_nao_configurada: 'A Evolution ainda não foi configurada no Supabase.',
-    evolution_fora_do_ar: 'A Evolution não respondeu. Veja se a VPS está no ar.',
-    evolution_recusou: 'A Evolution recusou o envio. Veja se o WhatsApp está conectado.',
-    sem_permissao: 'Esta conta não tem permissão para enviar.',
-  }
-
   async function enviar() {
     const nome = f.responsavel?.nome_completo ?? 'a família'
     // O plano manda conversar antes (pessoalmente) com estas famílias.
@@ -95,71 +98,78 @@ export default function Cartao({
   }
 
   return (
-    <article className={`cartao risco-${f.risco}`}>
-      <div className="linha">
+    <article className="cartao">
+      <div className="cartao-topo">
         <button className="nome" onClick={() => abrir(f.id)}>
           {f.responsavel?.nome_completo ?? 'Sem nome'}
         </button>
-        <span className={`selo etapa-${etapa(f)}`}>{ETAPA_NOME[etapa(f)]}</span>
+        <span className={`risco risco-${f.risco}`}>
+          <i aria-hidden="true" />
+          {NOME_RISCO[f.risco]}
+        </span>
       </div>
-      <p className="alunos">
-        {f.alunos.map((a) => `${a.nome.split(' ')[0]} (${a.turma})`).join(' · ') || 'Sem aluno ativo em 2026'}
-      </p>
-      <p className="meta">
-        Turno 2027: <b>{f.turno2027 ?? 'não informou'}</b>
-        {f.proximo_contato && <> · Próximo contato: <b>{dataCurta(f.proximo_contato)}</b></>}
-      </p>
-      {f.etiquetas.length > 0 && (
-        <p className="etiquetas">
-          {f.etiquetas.map((e) => (
-            <span key={e} className="tag">
-              {ETIQUETA_NOME[e] ?? e}
-            </span>
-          ))}
-        </p>
-      )}
+
+      <p className="alunos">{f.alunos.map((a) => `${a.nome.split(' ')[0]} (${a.turma})`).join(' · ') || 'Sem aluno ativo em 2026'}</p>
+
+      <div className="fichas">
+        <span className={`selo etapa-${etapa(f)}`}>{ETAPA_NOME[etapa(f)]}</span>
+        <span className="ficha">Turno 2027: <b>{f.turno2027 ?? 'não informou'}</b></span>
+        {f.proximo_contato && (
+          <span className="ficha">
+            <Icone nome="relogio" tamanho={15} /> Retorno <b>{dataCurta(f.proximo_contato)}</b>
+          </span>
+        )}
+        {f.etiquetas.map((e) => (
+          <span key={e} className="tag">{ETIQUETA_NOME[e] ?? e}</span>
+        ))}
+      </div>
+
       {f.respostas > 0 && (
         <p className="resposta">
-          💬 {f.respostas === 1 ? 'Respondeu' : `${f.respostas} respostas`} no WhatsApp{!f.respondeu_em && ' · marque "Respondeu" se for resposta de verdade'}
+          <Icone nome="conversa" tamanho={17} />
+          <span>
+            {f.respostas === 1 ? 'Respondeu' : `${f.respostas} respostas`} no WhatsApp
+            {!f.respondeu_em && ' · marque "Respondeu" se for resposta de verdade'}
+          </span>
         </p>
       )}
       {f.observacao && <p className="obs">“{f.observacao}”</p>}
 
       <button className="enviar" disabled={ocupado} onClick={enviar}>
-        {f.comunicadoEm ? `✓ Comunicado enviado em ${dataCurta(f.comunicadoEm)} · reenviar` : 'Enviar comunicado pelo WhatsApp'}
+        <Icone nome={f.comunicadoEm ? 'check' : 'conversa'} tamanho={20} traco={2.6} />
+        {f.comunicadoEm ? `Enviado em ${dataCurta(f.comunicadoEm).split(',')[0]} · reenviar` : 'Enviar comunicado'}
       </button>
       {wa && (
-        <a className="whats" href={wa} target="_blank" rel="noopener noreferrer">
-          Abrir WhatsApp
+        <a className="abrir-wa" href={wa} target="_blank" rel="noopener noreferrer">
+          Abrir conversa no WhatsApp <Icone nome="seta" tamanho={17} />
         </a>
       )}
 
-      <div className="botoes">
+      <div className="etapas" role="group" aria-label="Etapa da família">
         {BOTOES.map((b) => {
           const ativo = Boolean(f[b.campo])
           return (
-            <button key={b.marco} className={ativo ? 'feito' : ''} disabled={ocupado} onClick={() => tocar(b.marco, ativo)}>
-              {ativo ? '✓ ' : ''}
+            <button key={b.marco} data-etapa={b.marco} className={ativo ? 'feito' : ''} aria-pressed={ativo} disabled={ocupado} onClick={() => tocar(b.marco, ativo)}>
+              {ativo && <Icone nome="check" tamanho={16} traco={3} />}
               {b.rotulo}
             </button>
           )
         })}
       </div>
 
-      <div className="canal">
-        Canal:
-        {(['whatsapp', 'presencial', 'ligacao'] as Canal[]).map((c) => (
-          <button key={c} className={canal === c ? 'sel' : ''} onClick={() => mudarCanal(c)}>
-            {{ whatsapp: 'WhatsApp', presencial: 'Presencial', ligacao: 'Ligação' }[c]}
-          </button>
-        ))}
-      </div>
-
-      <button className="link" onClick={() => setAberto(!aberto)}>
+      <button className="mais" onClick={() => setAberto(!aberto)} aria-expanded={aberto}>
+        <Icone nome={aberto ? 'fechar' : 'mais'} tamanho={16} />
         {aberto ? 'Fechar anotação' : 'Anotar e agendar retorno'}
       </button>
       {aberto && (
         <div className="anotar">
+          <div className="canal" role="group" aria-label="Canal do contato">
+            {(['whatsapp', 'presencial', 'ligacao'] as Canal[]).map((c) => (
+              <button key={c} className={canal === c ? 'sel' : ''} aria-pressed={canal === c} onClick={() => mudarCanal(c)}>
+                {{ whatsapp: 'WhatsApp', presencial: 'Presencial', ligacao: 'Ligação' }[c]}
+              </button>
+            ))}
+          </div>
           <textarea placeholder="O que ela disse?" value={nota} onChange={(e) => setNota(e.target.value)} rows={3} />
           <label>
             Próximo contato
@@ -180,7 +190,7 @@ export default function Cartao({
           </button>
         </div>
       )}
-      {erro && <p className="aviso">{erro}</p>}
+      {erro && <p className="aviso" role="alert">{erro}</p>}
     </article>
   )
 }

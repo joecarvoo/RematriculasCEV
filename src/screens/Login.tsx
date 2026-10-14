@@ -1,5 +1,6 @@
 import { FormEvent, useState } from 'react'
 import { supabase } from '../supabase'
+import { Anel, Forma } from '../ui'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -17,10 +18,14 @@ export default function Login() {
   }
 
   return (
-    <main className="centro">
-      <form className="cartao login" onSubmit={entrar}>
-        <img src="/cev-logo.png" alt="CEV" height={56} />
+    <main className="login-tela">
+      <Forma className="forma-login" />
+      <form className="login" onSubmit={entrar}>
+        <Anel tamanho={88}>
+          <img src="/cev-logo.png" alt="Centro Educacional Vencedores" width={44} height={44} />
+        </Anel>
         <h1>Rematrícula 2027</h1>
+        <p>Entre para acompanhar as famílias do CEV.</p>
         <label>
           E-mail
           <input type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
@@ -29,7 +34,7 @@ export default function Login() {
           Senha
           <input type="password" autoComplete="current-password" value={senha} onChange={(e) => setSenha(e.target.value)} required />
         </label>
-        {erro && <p className="aviso">{erro}</p>}
+        {erro && <p className="aviso" role="alert">{erro}</p>}
         <button className="primario" disabled={enviando}>
           {enviando ? 'Entrando…' : 'Entrar'}
         </button>
