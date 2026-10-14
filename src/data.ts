@@ -83,3 +83,14 @@ export async function carregarMensagens(familiaId: string): Promise<Mensagem[]> 
   if (error) throw new Error('mensagens')
   return data as Mensagem[]
 }
+
+/** Todos os registros (para paradas, relatório e motivos de hesitação). */
+export async function carregarRegistrosGerais(): Promise<Registro[]> {
+  const { data, error } = await supabase
+    .from('rematricula_registros')
+    .select('id, familia_id, criado_em, canal, resultado, nota, proximo_contato')
+    .order('criado_em', { ascending: false })
+    .limit(5000)
+  if (error) throw new Error('registros')
+  return data as Registro[]
+}

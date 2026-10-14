@@ -20,7 +20,7 @@ const mk = (id: string, nome: string, alunos: [string, string][], extra: Partial
 
 const familias: Familia[] = [
   mk('1', 'Carolina Mendes Rocha', [['Helena Mendes Rocha', '2º Ano']], { risco: 'vermelha', etiquetas: ['remanejado'], turno2027: 'Vespertino', observacao: 'Ficou preocupada com a turma única à tarde.' }),
-  mk('2', 'Rafael Nogueira Dias', [['Davi Nogueira Dias', 'Maternal 1'], ['Lara Nogueira Dias', 'Pré 2']], { risco: 'amarela', etiquetas: ['irmaos'], turno2027: 'Matutino', contatado_em: h(30), comunicadoEm: h(30), proximo_contato: new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Manaus' }).format(new Date()), respostas: 1 }),
+  mk('2', 'Rafael Nogueira Dias', [['Davi Nogueira Dias', 'Maternal 1'], ['Lara Nogueira Dias', 'Pré 2']], { risco: 'amarela', etiquetas: ['irmaos'], turno2027: 'Matutino', contatado_em: h(96), comunicadoEm: h(96), proximo_contato: new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Manaus' }).format(new Date()), respostas: 1 }),
   mk('3', 'Mariana Teixeira Lopes', [['Sofia Teixeira Lopes', 'Pré 1']], { turno2027: 'Integral', contatado_em: h(50), respondeu_em: h(48), comunicadoEm: h(50), respostas: 1 }),
   mk('4', 'Paulo Ribeiro Castro', [['Miguel Ribeiro Castro', '1º Ano']]),
   mk('5', 'Beatriz Alencar Souza', [['Alice Alencar Souza', 'Maternal 2']], { contatado_em: h(70), respondeu_em: h(60), reserva_confirmada_em: h(20), comunicadoEm: h(70) }),
@@ -36,6 +36,13 @@ const registros: Registro[] = [
   { id: 'r1', familia_id: '2', criado_em: h(30), canal: 'whatsapp', resultado: 'Comunicado geral enviado', nota: 'Enviado pelo painel (Evolution API)', proximo_contato: null },
 ]
 
+const registrosGerais: Registro[] = [
+  ...registros,
+  { id: 'a1', familia_id: '1', criado_em: h(24 * 5), canal: 'presencial', resultado: 'Anotação', nota: 'Preocupada com o turno da tarde e com o valor depois do desconto', proximo_contato: null },
+  { id: 'a2', familia_id: '3', criado_em: h(24 * 2), canal: 'whatsapp', resultado: 'Anotação', nota: 'Vai conversar com o marido e está vendo outras escolas', proximo_contato: null },
+  { id: 'a3', familia_id: '6', criado_em: h(24 * 8), canal: 'ligacao', resultado: 'Anotação', nota: 'Mudando de bairro, transporte é dúvida', proximo_contato: null },
+]
+
 const p = new URLSearchParams(location.search)
 const tela = p.get('tela') ?? 'hoje'
 const noop = async () => undefined
@@ -46,11 +53,12 @@ createRoot(document.getElementById('root')!).render(
   ) : (
     <Shell
       familias={familias}
+      registros={registrosGerais}
       erro=""
       carregando={false}
       recarregar={noop}
       sair={() => undefined}
-      abaInicial={tela === 'todas' ? 'todas' : tela === 'painel' ? 'painel' : 'hoje'}
+      abaInicial={tela === 'todas' ? 'todas' : tela === 'painel' ? 'painel' : tela === 'relatorio' ? 'relatorio' : 'hoje'}
       abertaInicial={tela === 'familia' ? '2' : null}
       demo={{ mensagens, registros }}
     />

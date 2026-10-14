@@ -1,7 +1,9 @@
-import { Familia, MARCOS, hoje } from '../lib'
+import { paradas } from '../analise'
+import { ETAPA_NOME, Familia, MARCOS, Registro, etapa, hoje } from '../lib'
+import GraficoDias from './GraficoDias'
 import { Anel, Estatistica, Icone } from '../ui'
 
-export default function Painel({ familias }: { familias: Familia[] }) {
+export default function Painel({ familias, registros, abrir }: { familias: Familia[]; registros: Registro[]; abrir: (id: string) => void }) {
   const total = familias.length
   const n = {
     contatadas: familias.filter((f) => f.contatado_em).length,
@@ -16,6 +18,7 @@ export default function Painel({ familias }: { familias: Familia[] }) {
     { cor: 'amarelo', valor: n.paga, nome: 'Pagaram' },
   ]
   const dia = hoje()
+  const paradasAgora = paradas(familias, registros)
   const proximo = MARCOS.find((m) => m.data >= dia)
   const pct = total ? Math.round((n.reserva / total) * 100) : 0
 
@@ -46,6 +49,32 @@ export default function Painel({ familias }: { familias: Familia[] }) {
         ))}
       </ul>
 
+      <h3>Resultado por dia</h3>
+      <GraficoDias familias={familias} />
+
+      <h3>
+        Paradas há mais de 3 dias <span className="contagem">{paradasAgora.length}</span>
+      </h3>
+      {paradasAgora.length === 0 ? (
+        <p className="vazio">
+          <b>Nenhuma família parada.</b>
+          Quem está em andamento teve contato nos últimos 3 dias.
+        </p>
+      ) : (
+        <ul className="lista">
+          {paradasAgora.map(({ familia: f, dias }) => (
+            <li key={f.id} className="linha-todas">
+              <button className="nome" onClick={() => abrir(f.id)}>
+                {f.responsavel?.nome_completo}
+                <small>
+                  {ETAPA_NOME[etapa(f)]} · sem contato há {dias} dias
+                </small>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
       <h3>Metas da campanha</h3>
       <ol className="marcos">
         {MARCOS.map((m, i) => {
@@ -70,7 +99,6 @@ export default function Painel({ familias }: { familias: Familia[] }) {
           )
         })}
       </ol>
-      <p className="meta">Gráfico por dia, famílias paradas e relatório da semana entram na versão 2.</p>
     </section>
   )
 }

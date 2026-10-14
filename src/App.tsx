@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { configurado, supabase } from './supabase'
-import { carregarFamilias } from './data'
-import type { Familia } from './lib'
+import { carregarFamilias, carregarRegistrosGerais } from './data'
+import type { Familia, Registro } from './lib'
 import Login from './screens/Login'
 import Shell from './Shell'
 
 export default function App() {
   const [sessao, setSessao] = useState<Session | null | undefined>(undefined)
   const [familias, setFamilias] = useState<Familia[]>([])
+  const [registros, setRegistros] = useState<Registro[]>([])
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
 
@@ -24,6 +25,8 @@ export default function App() {
     setErro('')
     try {
       setFamilias(await carregarFamilias())
+      // O histórico alimenta paradas e relatório; se falhar, o resto do painel continua.
+      setRegistros(await carregarRegistrosGerais().catch(() => []))
     } catch {
       setErro('Não consegui carregar as famílias. Confira a internet e tente de novo.')
     } finally {
@@ -47,5 +50,5 @@ export default function App() {
   if (sessao === undefined) return <main className="centro">Carregando…</main>
   if (!sessao) return <Login />
 
-  return <Shell familias={familias} erro={erro} carregando={carregando} recarregar={recarregar} sair={() => supabase.auth.signOut()} />
+  return <Shell familias={familias} registros={registros} erro={erro} carregando={carregando} recarregar={recarregar} sair={() => supabase.auth.signOut()} />
 }

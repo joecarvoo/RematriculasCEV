@@ -3,14 +3,16 @@ import { Familia, Mensagem, Registro } from './lib'
 import Hoje from './screens/Hoje'
 import Todas from './screens/Todas'
 import Painel from './screens/Painel'
+import Relatorio from './screens/Relatorio'
 import Busca from './screens/Busca'
 import FamiliaTela from './screens/FamiliaTela'
 import { Forma, Icone, PilulaLogo } from './ui'
 
-export type Aba = 'hoje' | 'todas' | 'painel'
+export type Aba = 'hoje' | 'todas' | 'painel' | 'relatorio'
 
 export default function Shell({
   familias,
+  registros,
   erro,
   carregando,
   recarregar,
@@ -20,6 +22,7 @@ export default function Shell({
   demo,
 }: {
   familias: Familia[]
+  registros: Registro[]
   erro: string
   carregando: boolean
   recarregar: () => Promise<void>
@@ -55,14 +58,16 @@ export default function Shell({
       <main>
         {aba === 'hoje' && <Hoje familias={familias} abrir={setAberta} atualizar={recarregar} />}
         {aba === 'todas' && <Todas familias={familias} abrir={setAberta} atualizar={recarregar} />}
-        {aba === 'painel' && <Painel familias={familias} />}
+        {aba === 'painel' && <Painel familias={familias} registros={registros} abrir={setAberta} />}
+        {aba === 'relatorio' && <Relatorio familias={familias} registros={registros} abrir={setAberta} />}
       </main>
 
       <nav className="abas" aria-label="Seções">
         {([
           ['hoje', 'Hoje', 'relogio'],
           ['todas', 'Todas', 'livro'],
-          ['painel', 'Painel', 'estrela'],
+          ['painel', 'Painel', 'grafico'],
+          ['relatorio', 'Relatório', 'papel'],
         ] as [Aba, string, string][]).map(([a, nome, icone]) => (
           <button key={a} className={aba === a ? 'ativa' : ''} aria-current={aba === a ? 'page' : undefined} onClick={() => setAba(a)}>
             <Icone nome={icone} tamanho={20} />

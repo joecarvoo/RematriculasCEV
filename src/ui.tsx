@@ -13,6 +13,9 @@ const ICONES: Record<string, string[]> = {
   mais: ['M12 5v14', 'M5 12h14'],
   voltar: ['M19 12H5', 'M11 6l-6 6 6 6'],
   sair: ['M10 4H5v16h5', 'M15 8l4 4-4 4', 'M19 12H9'],
+  grafico: ['M5 20V11', 'M12 20V4', 'M19 20v-6'],
+  papel: ['M6 3h9l4 4v14H6z', 'M14 3v5h5', 'M9 13h6', 'M9 17h6'],
+  copiar: ['M9 9h10v11H9z', 'M5 15V4h10'],
 }
 
 export function Icone({ nome, tamanho = 20, traco = 2.4 }: { nome: string; tamanho?: number; traco?: number }) {

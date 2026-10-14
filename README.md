@@ -8,7 +8,11 @@ Painel para o Joel acompanhar, todo dia, a campanha de rematrícula 2027 do Cent
 - **Painel:** contadores, barras de reserva (até 31/10) e de pagamento (até 30/11) e as metas por data.
 - **Família:** histórico completo (nunca se apaga), risco e etiquetas.
 
-Fica para a versão 2: gráfico por dia, famílias paradas há mais de 3 dias e relatório de 19 a 23/10. Versão 3: integração com a Danielle (n8n) e o Asaas.
+**Versão 2 (pronta):**
+- **Painel:** anel Estatística, barras por etapa, **gráfico por dia** (toque num dia para ver os números; ciano e amarelo têm pouco contraste com o fundo, então os valores sempre aparecem escritos e há "Ver em tabela"), **famílias paradas há mais de 3 dias** e as metas.
+- **Relatório** (19 a 23/10 ou tudo até hoje): por dia, por turma, motivos de hesitação (palavras-chave nas anotações: preço, turno, turma, outras escolas, decisão em família, transporte e mudança), quem ficou sem resposta e "Copiar resumo".
+- Cores do gráfico validadas com o validador de paleta: separação entre as 4 cores boa (ΔE 18,6 para daltônicos); contraste de ciano e amarelo com o fundo abaixo de 3:1, compensado com valores escritos e tabela.
+Versão 3: integração com a Danielle (n8n) e o Asaas.
 
 ## Envio do comunicado pelo WhatsApp (Evolution API)
 O comunicado leva botões de resposta rápida (micro compromisso sobre o turno 2027) e cada toque vira uma ação no painel (ver CLAUDE.md). O botão verde do cartão chama a função `supabase/functions/enviar-whatsapp`, que monta o comunicado geral com o nome do responsável e do(s) aluno(s), manda pela Evolution, registra no histórico e marca a família como Contatada. A chave da Evolution fica só nos segredos do Supabase (Edge Functions → Secrets): `EVOLUTION_URL`, `EVOLUTION_API_KEY`, `EVOLUTION_INSTANCE` e, se a Evolution for a v1, `EVOLUTION_VERSION=1`. Nunca no site nem no repositório. Se a família já recebeu, o app pergunta antes de reenviar. Para testar sem enviar, a função aceita `simular: true`.
