@@ -65,7 +65,10 @@ export default function Cartao({
 
   async function enviar() {
     const nome = f.responsavel?.nome_completo ?? 'a família'
-    if (!confirm(`Enviar o comunicado geral agora para ${nome}?`)) return
+    // O plano manda conversar antes (pessoalmente) com estas famílias.
+    const especial = f.risco === 'vermelha' || f.etiquetas.some((e) => ['remanejado', 'quarto_ano', 'responsavel_legal', 'integral'].includes(e))
+    const aviso = especial ? `\n\nATENÇÃO: o plano diz para conversar com esta família antes de mandar mensagem (risco vermelho ou situação especial). Enviar mesmo assim?` : ''
+    if (!confirm(`Enviar o comunicado geral agora para ${nome}?${aviso}`)) return
     setOcupado(true)
     setErro('')
     try {

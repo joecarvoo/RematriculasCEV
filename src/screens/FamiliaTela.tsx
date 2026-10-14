@@ -94,7 +94,7 @@ export default function FamiliaTela({
           {mensagens?.map((m) => (
             <li key={m.id} className={m.direcao}>
               <small>
-                {m.direcao === 'enviada' ? 'Enviada por nós' : 'Resposta da família'} · {dataCurta(m.criado_em)}
+                {m.direcao === 'enviada' ? 'Enviada por nós' : m.tipo === 'botao' ? 'Resposta pelo botão' : 'Resposta da família'} · {dataCurta(m.criado_em)}
                 {m.direcao === 'enviada' && <b className={`st-${m.status}`}> · {STATUS_MENSAGEM[m.status]}</b>}
               </small>
               <details>

@@ -1,7 +1,7 @@
 // Envia o comunicado geral da rematrícula 2027 pela Evolution API.
 // Roda com a identidade de quem clicou (RLS vale): só o administrador consegue.
 // Segredos (Supabase → Edge Functions → Secrets): EVOLUTION_URL, EVOLUTION_API_KEY, EVOLUTION_INSTANCE
-// Opcional: EVOLUTION_VERSION ("2" é o padrão; use "1" para a Evolution v1).
+// Usa o envio de botões da Evolution v2 (testado na 2.4.0).
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 
@@ -24,9 +24,14 @@ function listaNomes(nomes: string[]) {
   return nomes.slice(0, -1).join(', ') + ' e ' + nomes[nomes.length - 1]
 }
 
-// Texto do comunicado geral (plano de 14/10), personalizado com responsável e aluno(s).
-function comunicado(responsavel: string, alunos: string[]) {
-  return `Olá, ${responsavel}! 💙
+// Comunicado geral (plano de 14/10) + pergunta de micro compromisso com botões de resposta rápida.
+// Texto neutro em gênero e número: serve para um filho ou para irmãos.
+const NOME_TURNO: Record<string, string> = { Matutino: 'da manhã', Vespertino: 'da tarde', Integral: 'Integral' }
+
+type Botao = { type: 'reply'; displayText: string; id: string }
+
+function comunicado(responsavel: string, alunos: string[], turno: string | null) {
+  const corpo = `Olá, ${responsavel}! 💙
 
 Estamos organizando as turmas de 2027 e queremos garantir a vaga de ${listaNomes(alunos)}, no turno que faz mais sentido para a rotina de vocês.
 
@@ -35,6 +40,25 @@ Nesta semana nossa equipe vai conversar com cada família, pessoalmente ou por m
 Um aviso importante: a rematrícula 2027 terá uma condição especial de 1º a 30 de novembro. Por isso, em outubro não há nada para pagar. Vamos apenas reservar a vaga e deixar tudo pronto para vocês aproveitarem a condição em novembro.
 
 Qualquer dúvida, é só falar com a gente. Obrigado por fazer parte da história do CEV!`
+
+  if (turno && NOME_TURNO[turno]) {
+    return {
+      descricao: `${corpo}\n\nPara eu já adiantar a vaga: o turno continua sendo o ${NOME_TURNO[turno]}? Toque numa opção:`,
+      botoes: [
+        { type: 'reply', displayText: 'Sim, pode manter', id: 'manter' },
+        { type: 'reply', displayText: 'Quero mudar turno', id: 'mudar' },
+        { type: 'reply', displayText: 'Prefiro conversar', id: 'conversar' },
+      ] as Botao[],
+    }
+  }
+  return {
+    descricao: `${corpo}\n\nPara eu já adiantar a vaga: qual turno funciona melhor para a rotina de vocês em 2027? Toque numa opção:`,
+    botoes: [
+      { type: 'reply', displayText: 'Manhã', id: 'turno_Matutino' },
+      { type: 'reply', displayText: 'Tarde', id: 'turno_Vespertino' },
+      { type: 'reply', displayText: 'Integral', id: 'turno_Integral' },
+    ] as Botao[],
+  }
 }
 
 function telefone(bruto: string | null): string | null {
@@ -92,11 +116,17 @@ Deno.serve(async (req) => {
     .filter(Boolean)
   if (alunos.length === 0) return json({ erro: 'sem_aluno' }, 422)
 
-  const texto = comunicado(primeiroNome(resp.nome_completo), alunos)
+  // Turno que a família já informou pelo WhatsApp (a tabela compara pelos 8 últimos dígitos).
+  const { data: prefs } = await db.from('preferencias_turno_2027').select('telefone, turno_preferido')
+  const alvo = numero.slice(-8)
+  const turno = (prefs ?? []).find((p) => String(p.telefone ?? '').replace(/\D/g, '').slice(-8) === alvo)?.turno_preferido ?? null
+
+  const { descricao, botoes } = comunicado(primeiroNome(resp.nome_completo), alunos, turno)
+  const texto = `${descricao}\n\n[${botoes.map((b) => b.displayText).join(' | ')}]`
 
   // Simulação: devolve só o tamanho e se sobrou algum [colchete]; não envia nada.
   if (pedido.simular) {
-    return json({ simulado: true, caracteres: texto.length, sobrou_colchete: /[\[\]{}]/.test(texto), alunos: alunos.length })
+    return json({ simulado: true, caracteres: texto.length, sobrou_colchete: /[\[\]{}]/.test(descricao), alunos: alunos.length, botoes: botoes.length, turno_conhecido: Boolean(turno) })
   }
 
   if (!pedido.forcar) {
@@ -114,12 +144,17 @@ Deno.serve(async (req) => {
   const instancia = Deno.env.get('EVOLUTION_INSTANCE')
   if (!url || !chave || !instancia) return json({ erro: 'evolution_nao_configurada' }, 500)
 
-  const corpo =
-    Deno.env.get('EVOLUTION_VERSION') === '1' ? { number: numero, textMessage: { text: texto } } : { number: numero, text: texto }
+  const corpo = {
+    number: numero,
+    title: 'Rematrícula 2027',
+    description: descricao,
+    footer: 'Centro Educacional Vencedores',
+    buttons: botoes,
+  }
 
   let resposta: Response
   try {
-    resposta = await fetch(`${url}/message/sendText/${encodeURIComponent(instancia)}`, {
+    resposta = await fetch(`${url}/message/sendButtons/${encodeURIComponent(instancia)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', apikey: chave },
       body: JSON.stringify(corpo),
@@ -135,7 +170,7 @@ Deno.serve(async (req) => {
   await db.from('rematricula_mensagens').insert({
     familia_id: fam.id,
     direcao: 'enviada',
-    tipo: 'comunicado_geral',
+    tipo: 'comunicado_botoes',
     texto,
     evolution_id: retorno?.key?.id ?? null,
     status: 'enviada',

@@ -16,6 +16,30 @@ const STATUS: Record<string, string> = {
   ERROR: 'falhou',
 }
 
+const hoje = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Manaus' }).format(new Date())
+
+// Toque num botão de resposta rápida: devolve o id do botão e o rótulo, em qualquer um dos formatos do WhatsApp.
+function botaoDe(msg: Record<string, any> | undefined): { id: string; rotulo: string } | null {
+  if (!msg) return null
+  const b = msg.buttonsResponseMessage ?? msg.templateButtonReplyMessage ?? msg.listResponseMessage
+  if (b) {
+    return {
+      id: String(b.selectedButtonId ?? b.selectedId ?? b.singleSelectReply?.selectedRowId ?? ''),
+      rotulo: String(b.selectedDisplayText ?? b.title ?? ''),
+    }
+  }
+  const nf = msg.interactiveResponseMessage?.nativeFlowResponseMessage
+  if (nf?.paramsJson) {
+    try {
+      const p = JSON.parse(nf.paramsJson)
+      return { id: String(p.id ?? ''), rotulo: String(p.display_text ?? msg.interactiveResponseMessage?.body?.text ?? '') }
+    } catch {
+      return null
+    }
+  }
+  return null
+}
+
 const digitos = (s: unknown) => String(s ?? '').replace(/\D/g, '')
 const final8 = (s: unknown) => digitos(s).slice(-8)
 
@@ -25,6 +49,37 @@ function textoDe(msg: Record<string, any> | undefined, tipo: string | undefined)
   const t = msg.conversation ?? msg.extendedTextMessage?.text ?? msg.imageMessage?.caption ?? msg.videoMessage?.caption
   if (t) return String(t)
   return `[${tipo ?? 'mensagem'} sem texto: abra o WhatsApp para ver]`
+}
+
+// Cada botão vira uma ação. Responder pelo botão é resposta de verdade: marca "Respondeu".
+// Reserva fica com o Joel (ele só confirma depois de conversar).
+async function aplicarBotao(db: ReturnType<typeof createClient>, familiaId: string, id: string, rotulo: string) {
+  let resultado: string | null = null
+  let retornoHoje = false
+  if (id === 'manter') resultado = 'Pelo botão: pode manter o turno'
+  else if (id === 'mudar') {
+    resultado = 'Pelo botão: quer mudar o turno'
+    retornoHoje = true
+  } else if (id === 'conversar') {
+    resultado = 'Pelo botão: prefere conversar com a equipe'
+    retornoHoje = true
+  } else if (id.startsWith('turno_')) resultado = `Pelo botão: escolheu o turno ${id.slice(6)}`
+  if (!resultado) return
+
+  const agora = new Date().toISOString()
+  const { data: fam } = await db.from('rematricula_familias').select('contatado_em, respondeu_em').eq('id', familiaId).maybeSingle()
+  const patch: Record<string, string | null> = {}
+  if (fam && !fam.contatado_em) patch.contatado_em = agora
+  if (fam && !fam.respondeu_em) patch.respondeu_em = agora
+  if (retornoHoje) patch.proximo_contato = hoje()
+  if (Object.keys(patch).length) await db.from('rematricula_familias').update(patch).eq('id', familiaId)
+  await db.from('rematricula_registros').insert({
+    familia_id: familiaId,
+    canal: 'whatsapp',
+    resultado,
+    nota: `Botão tocado: ${rotulo}`,
+    proximo_contato: retornoHoje ? hoje() : null,
+  })
 }
 
 Deno.serve(async (req) => {
@@ -72,20 +127,27 @@ Deno.serve(async (req) => {
           (j) => typeof j === 'string' && j.endsWith('@s.whatsapp.net'),
         ) as string[]
         const familiaId = jids.map((j) => porFinal.get(final8(j))).find(Boolean)
-        const texto = textoDe(d.message, d.messageType)
+        const botao = botaoDe(d.message)
+        const texto = botao ? botao.rotulo || botao.id : textoDe(d.message, d.messageType)
         if (!familiaId || !texto || !k.id) continue
         const quando = Number(d.messageTimestamp)
-        await db.from('rematricula_mensagens').upsert(
-          {
-            familia_id: familiaId,
-            direcao: 'recebida',
-            texto,
-            evolution_id: k.id,
-            status: 'recebida',
-            criado_em: quando > 0 ? new Date(quando * 1000).toISOString() : new Date().toISOString(),
-          },
-          { onConflict: 'evolution_id', ignoreDuplicates: true },
-        )
+        const { data: nova } = await db
+          .from('rematricula_mensagens')
+          .upsert(
+            {
+              familia_id: familiaId,
+              direcao: 'recebida',
+              tipo: botao ? 'botao' : null,
+              texto,
+              evolution_id: k.id,
+              status: 'recebida',
+              criado_em: quando > 0 ? new Date(quando * 1000).toISOString() : new Date().toISOString(),
+            },
+            { onConflict: 'evolution_id', ignoreDuplicates: true },
+          )
+          .select('id')
+        // Só age uma vez por mensagem (o aviso pode chegar repetido).
+        if (botao && nova && nova.length > 0) await aplicarBotao(db, familiaId, botao.id, texto)
       }
     }
   } catch {
