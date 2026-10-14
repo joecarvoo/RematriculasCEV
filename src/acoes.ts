@@ -67,3 +67,17 @@ export async function salvarEtiquetas(id: string, etiquetas: string[]) {
   const { error } = await supabase.from('rematricula_familias').update({ etiquetas }).eq('id', id)
   if (error) throw new Error('etiquetas')
 }
+
+export type ResultadoEnvio = 'enviado' | 'ja_enviado' | 'erro'
+
+/** Manda o comunicado geral pela Evolution (função enviar-whatsapp). */
+export async function enviarComunicado(familiaId: string, forcar = false): Promise<ResultadoEnvio> {
+  const { data, error } = await supabase.functions.invoke('enviar-whatsapp', {
+    body: { familia_id: familiaId, forcar },
+  })
+  if (data?.enviado) return 'enviado'
+  // A função responde 409 quando já enviou: o supabase-js entrega isso em `error.context`.
+  const corpo = await (error as { context?: Response } | null)?.context?.json?.().catch(() => null)
+  if (corpo?.erro === 'ja_enviado') return 'ja_enviado'
+  throw new Error(corpo?.erro ?? 'envio')
+}

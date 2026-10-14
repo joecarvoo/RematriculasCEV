@@ -10,6 +10,9 @@ Painel para o Joel acompanhar, todo dia, a campanha de rematrícula 2027 do Cent
 
 Fica para a versão 2: gráfico por dia, famílias paradas há mais de 3 dias e relatório de 19 a 23/10. Versão 3: integração com a Danielle (n8n) e o Asaas.
 
+## Envio do comunicado pelo WhatsApp (Evolution API)
+O botão verde do cartão chama a função `supabase/functions/enviar-whatsapp`, que monta o comunicado geral com o nome do responsável e do(s) aluno(s), manda pela Evolution, registra no histórico e marca a família como Contatada. A chave da Evolution fica só nos segredos do Supabase (Edge Functions → Secrets): `EVOLUTION_URL`, `EVOLUTION_API_KEY`, `EVOLUTION_INSTANCE` e, se a Evolution for a v1, `EVOLUTION_VERSION=1`. Nunca no site nem no repositório. Se a família já recebeu, o app pergunta antes de reenviar. Para testar sem enviar, a função aceita `simular: true`.
+
 ## Como funciona
 - Lê direto do Supabase (`rwimyzactkmouqzgabui`): alunos ativos em 2026, responsável financeiro e turno 2027 do WhatsApp. Não copia dados.
 - Tabelas novas: `rematricula_familias` (54 linhas já importadas) e `rematricula_registros`. SQL em `supabase/migrations/`.

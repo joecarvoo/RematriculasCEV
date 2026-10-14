@@ -33,6 +33,7 @@ export type Familia = {
   responsavel: { nome_completo: string; telefone_principal: string | null; email: string | null } | null
   alunos: { nome: string; turma: string; periodo: string }[]
   turno2027: string | null
+  comunicadoEm: string | null
 }
 
 export type Registro = {

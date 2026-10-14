@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { anotar, desfazer, marcar, Marco, NOME_MARCO } from '../acoes'
+import { anotar, desfazer, enviarComunicado, marcar, Marco, NOME_MARCO } from '../acoes'
 import { Canal, ETAPA_NOME, ETIQUETA_NOME, Familia, dataCurta, etapa, linkWhatsApp } from '../lib'
 
 const BOTOES: { marco: Marco; campo: keyof Familia; rotulo: string }[] = [
@@ -55,6 +55,33 @@ export default function Cartao({
     return rodar(() => marcar(f, marco, canal))
   }
 
+  const MENSAGEM_ERRO: Record<string, string> = {
+    telefone_invalido: 'O telefone dessa família não parece válido.',
+    evolution_nao_configurada: 'A Evolution ainda não foi configurada no Supabase.',
+    evolution_fora_do_ar: 'A Evolution não respondeu. Veja se a VPS está no ar.',
+    evolution_recusou: 'A Evolution recusou o envio. Veja se o WhatsApp está conectado.',
+    sem_permissao: 'Esta conta não tem permissão para enviar.',
+  }
+
+  async function enviar() {
+    const nome = f.responsavel?.nome_completo ?? 'a família'
+    if (!confirm(`Enviar o comunicado geral agora para ${nome}?`)) return
+    setOcupado(true)
+    setErro('')
+    try {
+      let r = await enviarComunicado(f.id)
+      if (r === 'ja_enviado') {
+        if (!confirm('O comunicado já foi enviado para essa família. Enviar de novo?')) return
+        r = await enviarComunicado(f.id, true)
+      }
+      await atualizar()
+    } catch (e) {
+      setErro(MENSAGEM_ERRO[(e as Error).message] ?? 'Não consegui enviar. Nada foi marcado.')
+    } finally {
+      setOcupado(false)
+    }
+  }
+
   function mudarCanal(c: Canal) {
     setCanal(c)
     try {
@@ -90,6 +117,9 @@ export default function Cartao({
       )}
       {f.observacao && <p className="obs">“{f.observacao}”</p>}
 
+      <button className="enviar" disabled={ocupado} onClick={enviar}>
+        {f.comunicadoEm ? `✓ Comunicado enviado em ${dataCurta(f.comunicadoEm)} · reenviar` : 'Enviar comunicado pelo WhatsApp'}
+      </button>
       {wa && (
         <a className="whats" href={wa} target="_blank" rel="noopener noreferrer">
           Abrir WhatsApp

@@ -13,5 +13,8 @@ Mini-app do Joel (marketing/gestão do Centro Educacional Vencedores, Manaus) pa
 - Segurança: RLS por `current_pessoa_is_admin()`, histórico só leitura e inserção, nada de `service_role` no front, nada de nome ou telefone em log.
 - Mudança de banco: nova migração em `supabase/migrations/`.
 
+## Envio pela Evolution
+Função `enviar-whatsapp` (Supabase Edge Function, verify_jwt ligado, roda com a identidade de quem clicou). Texto do comunicado geral dentro dela. Segredos só no Supabase. Nunca testar envio real com telefone de família: usar `simular: true`.
+
 ## Estado atual
-Versão 1 pronta (14/10/2026): Hoje, Todas (risco), Painel básico e Família. Pendente: publicar, criar/definir o login, versão 2 (gráfico por dia, paradas, relatório) e versão 3 (n8n e Asaas). Pendências do Joe: remanejados do 3º ano e 4º ano, valores do Integral, preço dos livros, classificar o risco das 54 famílias.
+Versão 1 pronta (14/10/2026): Hoje, Todas (risco), Painel básico e Família. Publicado no Netlify; login da Coordenação com senha provisória definida pelo Joe (trocar depois). Botão de comunicado pronto, falta configurar os segredos da Evolution. Pendente: criar/definir o login, versão 2 (gráfico por dia, paradas, relatório) e versão 3 (n8n e Asaas). Pendências do Joe: remanejados do 3º ano e 4º ano, valores do Integral, preço dos livros, classificar o risco das 54 famílias.
